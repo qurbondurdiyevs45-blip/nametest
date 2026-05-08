@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background: black; color: #0f0; font-family: monospace; overflow: hidden; }
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.5; }
+        .terminal { padding: 20px; font-size: 18px; }
+        .input-line { display: flex; gap: 10px; }
+        input { background: none; border: none; color: #0f0; outline: none; width: 100%; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="terminal" id="output">
+        <div>> Tizim tayyor. 'help' deb yozing...</div>
+    </div>
+    <div class="terminal input-line">
+        <span>></span><input type="text" id="input" autofocus>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const letters = "0123456789ABCDEFHIJKLMNOPRSTUVWXYZ";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0f0"; ctx.font = fontSize + "px monospace";
+            drops.forEach((y, i) => {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 33);
+
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.toLowerCase();
+                const newLine = document.createElement('div');
+                newLine.textContent = "> " + cmd;
+                output.appendChild(newLine);
+                
+                let res = "Noma'lum buyruq.";
+                if(cmd === 'help') res = "Buyruqlar: hack, clear, date, about";
+                if(cmd === 'hack') res = "Pentagon tizimiga kirildi... (hazil)";
+                if(cmd === 'clear') { output.innerHTML = ''; res = "Tozalandi."; }
+                
+                const response = document.createElement('div');
+                response.style.color = "white";
+                response.textContent = res;
+                output.appendChild(response);
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
